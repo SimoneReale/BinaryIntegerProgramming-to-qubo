@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qubo Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.3.1/math.min.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            margin: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Qubo Calculator</h1>
+
+<div>
+    <label for="matrixA">Matrix A (comma-separated values):</label>
+    <input type="text" id="matrixA" value="1,0,0,1,1,1,0,1,1,1,1;0,1,0,1,0,1,1,0,1,1,1;0,0,1,0,1,0,1,1,1,1,1">
+</div>
+
+<div>
+    <label for="vectorB">Vector b (comma-separated values):</label>
+    <input type="text" id="vectorB" value="1,1,1">
+</div>
+
+<div>
+    <label for="vectorC">Vector c (comma-separated values):</label>
+    <input type="text" id="vectorC" value="2,4,4,4,4,4,5,4,5,6,5">
+</div>
+
+<div>
+    <label for="penalty">Penalty:</label>
+    <input type="number" id="penalty" value="2">
+</div>
+
+<button onclick="calculateQubo()">Calculate Qubo</button>
+
+<div id="matrixVisualization"></div>
+<p id="result"></p>
+
+<script>
+    function calculateQubo() {
+        const matrixAInput = document.getElementById('matrixA').value;
+        const vectorBInput = document.getElementById('vectorB').value;
+        const vectorCInput = document.getElementById('vectorC').value;
+        const penaltyInput = parseFloat(document.getElementById('penalty').value);
+
+        try {
+            const matrixA = math.matrix(parseInput(matrixAInput));
+            const vectorB = math.flatten(math.matrix(parseInput(vectorBInput)[0]));
+            const vectorC = math.flatten(math.matrix(parseInput(vectorCInput)[0]));
+
+            const Qubo_matrix = math.add(
+                math.multiply(penaltyInput, math.multiply(math.transpose(matrixA), matrixA)),
+                math.diag(vectorC)
+            );
+
+            const subtractionTerm = math.multiply(penaltyInput * 2, math.diag(math.multiply(math.transpose(vectorB), matrixA)));
+            const result = math.subtract(Qubo_matrix, subtractionTerm);
+            displayMatrix('Qubo Matrix', result.toArray());
+        } catch (error) {
+            document.getElementById('result').innerText = 'Error: ' + error.message;
+        }
+    }
+
+    function displayMatrix(title, matrix) {
+        const matrixContainer = document.getElementById('matrixVisualization');
+        const titleElement = document.createElement('h2');
+        titleElement.textContent = title;
+        matrixContainer.appendChild(titleElement);
+
+        const table = document.createElement('table');
+
+        for (const row of matrix) {
+            const tr = document.createElement('tr');
+
+            for (const cell of row) {
+                const td = document.createElement('td');
+                td.textContent = cell;
+                tr.appendChild(td);
+            }
+
+            table.appendChild(tr);
+        }
+
+        matrixContainer.appendChild(table);
+    }
+
+    function parseInput(input) {
+        return input.split(';').map(row => row.split(',').map(Number));
+    }
+</script>
+
+</body>
+</html>
