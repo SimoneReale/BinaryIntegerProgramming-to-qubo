@@ -46,6 +46,7 @@
 
 <div id="matrixVisualization"></div>
 <p id="result"></p>
+<p id="array"></p>
 
 <script>
     function calculateQubo() {
@@ -66,6 +67,7 @@
 
             const subtractionTerm = math.multiply(penaltyInput * 2, math.diag(math.multiply(math.transpose(vectorB), matrixA)));
             const result = math.subtract(Qubo_matrix, subtractionTerm);
+            document.getElementById('array').innerText = Qubo_matrix;
             displayMatrix('Qubo Matrix', result.toArray());
         } catch (error) {
             document.getElementById('result').innerText = 'Error: ' + error.message;
